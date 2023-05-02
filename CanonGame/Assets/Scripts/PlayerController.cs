@@ -5,6 +5,7 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     public static event System.Action<Vector3> Shooted;
+    public enum State { Aiming, Shooting, Waiting }
 
     [Header("Setup")]
     [SerializeField]
@@ -13,6 +14,8 @@ public class PlayerController : MonoBehaviour
     private GameObject cameraShot;
     [SerializeField]
     private GameObject cameraFollow;
+    [SerializeField]
+    private CameraController camController;
 
     [Header("Values")]
     [SerializeField]
@@ -22,16 +25,20 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private float shotMaxPower = 100;
 
-    private enum State { Aiming, Shooting }
-
     private State _currentState = State.Aiming;
     private Rigidbody _rigidbody;
 
     private void Awake()
     {
-        cameraShot.SetActive(true);
-        cameraFollow.SetActive(false);
+        WhiteBall.Impact += Impact;
+
         _rigidbody = wBall.GetComponent<Rigidbody>();
+    }
+
+    private void OnDestroy()
+    {
+        WhiteBall.Impact -= Impact;
+        
     }
 
     private void Aim()
@@ -65,6 +72,15 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private void Impact(Vector3 impactPoint)
+    {
+        if (_currentState != State.Waiting)
+        {
+            SwitchState(State.Waiting);
+            camController.GetRightImpactCamera(impactPoint);
+        }
+    }
+
     private void FixedUpdate()
     {
         if (_currentState == State.Aiming)
@@ -87,11 +103,14 @@ public class PlayerController : MonoBehaviour
         {
             case State.Shooting:
                 {
-                    cameraShot.SetActive(false);
-                    cameraFollow.SetActive(true);
-                    _currentState = newState;
+                    camController.SwitchState(newState);
+                    break;
+                }
+            case State.Waiting:
+                {
                     break;
                 }
         }
+        _currentState = newState;
     }
 }

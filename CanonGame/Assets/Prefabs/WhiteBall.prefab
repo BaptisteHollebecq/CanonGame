@@ -94,6 +94,7 @@ GameObject:
   - component: {fileID: 5091109489535626861}
   - component: {fileID: 9110294955303554410}
   - component: {fileID: 422144289109046479}
+  - component: {fileID: -7584436763068418023}
   m_Layer: 0
   m_Name: WhiteBall
   m_TagString: Untagged
@@ -146,3 +147,15 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 2
+--- !u!114 &-7584436763068418023
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7804467536731089088}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aebcdb5387c70074c8dd8de9ad202b55, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
