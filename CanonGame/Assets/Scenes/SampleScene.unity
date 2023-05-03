@@ -459,6 +459,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1868253902645097092, guid: ef53a2860be8e6644bed4da79597bd39, type: 3}
+      propertyPath: m_Mesh
+      value: 
+      objectReference: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
     - target: {fileID: 3278350936889275086, guid: ef53a2860be8e6644bed4da79597bd39, type: 3}
       propertyPath: m_Interpolate
       value: 0
@@ -511,6 +515,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Ball
       objectReference: {fileID: 0}
+    - target: {fileID: 8948940160218381523, guid: ef53a2860be8e6644bed4da79597bd39, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 10302, guid: 0000000000000000f000000000000000, type: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: ef53a2860be8e6644bed4da79597bd39, type: 3}
 --- !u!1001 &437560016
@@ -955,8 +963,9 @@ MonoBehaviour:
   cameraFollow: {fileID: 310439857}
   camController: {fileID: 103078278}
   aimMaxAngle: 60
-  angleStep: 2
+  angleStep: 1
   shotMaxPower: 2
+  slowMoAmonth: 2
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0

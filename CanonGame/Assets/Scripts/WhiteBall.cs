@@ -9,6 +9,7 @@ public class WhiteBall : Ball
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.transform.TryGetComponent(out Ball b) && b != this)
-            Impact?.Invoke(collision.contacts[0].point);
+            Impact?.Invoke(collision.transform.position);
     }
+
 }

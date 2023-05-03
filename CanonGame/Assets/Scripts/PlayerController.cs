@@ -24,6 +24,8 @@ public class PlayerController : MonoBehaviour
     private float angleStep = 3;
     [SerializeField]
     private float shotMaxPower = 100;
+    [SerializeField]
+    private float slowMoAmonth = 2;
 
     private State _currentState = State.Aiming;
     private Rigidbody _rigidbody;
@@ -91,6 +93,7 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        Debug.Log(Time.timeScale);
         if (_currentState == State.Aiming)
         {
             Shot();
@@ -104,10 +107,12 @@ public class PlayerController : MonoBehaviour
             case State.Shooting:
                 {
                     camController.SwitchState(newState);
+                    Time.timeScale = 1 / slowMoAmonth;
                     break;
                 }
             case State.Waiting:
                 {
+                    Time.timeScale = 1;
                     break;
                 }
         }
