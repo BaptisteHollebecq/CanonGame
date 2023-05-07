@@ -30,18 +30,20 @@ public class CameraController : MonoBehaviour
 
     public void GetRightImpactCamera(Vector3 impactPoint)
     {
+        // Cinemachine blend => cut for instant change
         brain.m_DefaultBlend.m_Style = CinemachineBlendDefinition.Style.Cut;
 
         cameraShot.SetActive(false);
         cameraFollow.SetActive(false);
 
+        // Place the impactCamera on the right position (z/-z => wich side of the table)
         cameraImpact.transform.position = new Vector3(impactPoint.x, 1, (impactPoint.z >= 0)? .5f : -.5f);
         cameraImpact.transform.rotation = Quaternion.LookRotation((impactPoint - cameraImpact.transform.position).normalized, Vector3.up);
-
         cameraImpact.gameObject.SetActive(true);
 
     }
 
+    // Set the right Cameras and their settings depending on the state
     public void SwitchState(PlayerController.State newState)
     {
         switch (newState)
@@ -66,7 +68,7 @@ public class CameraController : MonoBehaviour
             case PlayerController.State.Menu:
                 {
                     brain.m_DefaultBlend.m_Style = CinemachineBlendDefinition.Style.Linear;
-                    brain.m_DefaultBlend.m_Time = 1f;
+                    brain.m_DefaultBlend.m_Time = .5f;
                     cameraImpact.gameObject.SetActive(false);
                     cameraMenu.gameObject.SetActive(true);
                     cameraShot.SetActive(false);

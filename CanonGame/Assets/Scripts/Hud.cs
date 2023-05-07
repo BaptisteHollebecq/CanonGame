@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using DG.Tweening;
+using TMPro;
 
 public class Hud : MonoBehaviour
 {
@@ -12,11 +13,15 @@ public class Hud : MonoBehaviour
 
     [Header("Menu")]
     [SerializeField]
+    private GameObject title;
+    [SerializeField]
     private GameObject menu;
     [SerializeField]
     private Transform buttons;
     [SerializeField]
     private Transform pointer;
+    [SerializeField]
+    private TextMeshProUGUI victoryText;
 
     [Header("Game")]
     [SerializeField]
@@ -32,6 +37,8 @@ public class Hud : MonoBehaviour
     bool[] povs = new bool[6];
     bool camShown = false;
     Vector3 localPovCamStartingPosition = Vector3.zero;
+    bool paused = false;
+    bool won = false;
 
     int menuIndex = 0;
     bool started = false;
@@ -44,6 +51,8 @@ public class Hud : MonoBehaviour
         povCam.gameObject.SetActive(true);
         localPovCamStartingPosition = povCam.transform.localPosition;
         povCam.transform.DOLocalMoveX(1250, 0);
+
+        victoryText.gameObject.SetActive(false);
     }
 
     private void OnDestroy()
@@ -53,14 +62,26 @@ public class Hud : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.Escape) && started && !won)
         {
-            Pause?.Invoke();
-            menu.SetActive(true);
-            buttons.GetChild(1).gameObject.SetActive(true);
-            ZenitCamera.SetActive(false);
+            if (!paused)
+            {
+                Pause?.Invoke();
+                menu.SetActive(true);
+                buttons.GetChild(1).gameObject.SetActive(true);
+                ZenitCamera.SetActive(false);
+                paused = true;
+            }
+            else
+            {
+                menu.SetActive(false);
+                ZenitCamera.SetActive(true);
+                Play?.Invoke();
+                paused = false;
+            }
         }
 
+        // Detect player menu input only if the menu is displayed
        if (menu.activeSelf)
         {
             if (Input.GetKeyDown(KeyCode.UpArrow))
@@ -107,11 +128,33 @@ public class Hud : MonoBehaviour
         }
     }
 
+    // Set up the win screen menu
+    public void GameWon(int shots)
+    {
+        if (!won)
+        {
+            won = true;
+            Pause?.Invoke();
+            menu.SetActive(true);
+            buttons.GetChild(0).gameObject.SetActive(false);
+            buttons.GetChild(1).gameObject.SetActive(true);
+            ZenitCamera.SetActive(false);
+            victoryText.gameObject.SetActive(true);
+            title.SetActive(false);
+            victoryText.SetText("Well played, you won in " + shots + " shots !");
+
+            menuIndex = 1;
+            ActualisePointer();
+        }
+    }
+
+    //Actualise the visualiser for menu selection's position
     private void ActualisePointer()
     {
         pointer.SetParent(buttons.GetChild(menuIndex));
         pointer.localPosition = Vector3.zero;
     }
+
 
     public void PlayTheGame()
     {

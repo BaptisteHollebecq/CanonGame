@@ -16,18 +16,22 @@ public class WhiteBall : Ball
         startingPos = transform.position;
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private new void OnCollisionEnter(Collision collision)
     {
+        base.OnCollisionEnter(collision);
+
         if (collision.transform.TryGetComponent(out Ball b) && b != this)
             StartCoroutine(Impacted(collision.transform.position));
     }
 
+    // Delayed collision notification
     IEnumerator Impacted(Vector3 pos)
     {
         yield return new WaitForSeconds(0.05f);
         Impact?.Invoke(pos);
     }
 
+    // Teleport at starting position
     public void Repositioning()
     {
         _rigidbody.velocity = Vector3.zero;

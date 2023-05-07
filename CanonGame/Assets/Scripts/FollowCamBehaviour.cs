@@ -14,6 +14,7 @@ public class FollowCamBehaviour : MonoBehaviour
         PlayerController.Shooted -= AdjustPosition;
     }
 
+    // Just allign itself with white ball movement
     private void AdjustPosition(Vector3 direction)
     {
         transform.forward = new Vector3(direction.x, 0, direction.z);

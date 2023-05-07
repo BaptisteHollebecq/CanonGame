@@ -32,6 +32,7 @@ public class HoleCam : MonoBehaviour
         }
     }
 
+    // If there is a ball near the hole send information to the HUD
     private void OnAir(float distance)
     {
         if (!live)
@@ -58,16 +59,18 @@ public class HoleCam : MonoBehaviour
                 OnAir(99);
             return;
         }
-
+        // Find the nearest ball if there is multiple ball in the zone
         foreach (Ball b in balls)
         {
             if (b.velocityMagnitude != 0 && (b.transform.position - transform.position).magnitude < (nearest.transform.position - transform.position).magnitude)
                 nearest = b;
         }
 
+        // If not live and there is a ball moving turn on Live
         if (!live && nearest.velocityMagnitude != 0)
             OnAir((nearest.transform.position - transform.position).magnitude);
 
+        // If live but the bal ain't moving turn off live
         if (live && nearest.velocityMagnitude == 0)
             OnAir((nearest.transform.position - transform.position).magnitude);
     }

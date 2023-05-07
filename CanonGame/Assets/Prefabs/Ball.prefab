@@ -159,3 +159,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2617aa48747d1d34cbceee33c4974830, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  collideSound: {fileID: 1804024775931715139, guid: b855129a21775b44981377d30ecdcdac, type: 3}
+  velocityMagnitude: 0
