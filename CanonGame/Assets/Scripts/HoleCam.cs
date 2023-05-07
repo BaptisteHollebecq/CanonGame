@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
 
 public class HoleCam : MonoBehaviour
 {
@@ -11,14 +12,23 @@ public class HoleCam : MonoBehaviour
 
     List<Ball> balls = new List<Ball>();
     Ball nearest = null;
-    bool live = false;
+    public bool live = false;
+
+    private void Awake()
+    {
+        Holes.BallFell += RemoveBall;
+    }
+
+    void OnDestroy()
+    {
+        Holes.BallFell -= RemoveBall;
+    }
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.TryGetComponent(out Ball b))
         {
             balls.Add(b);
-            OnAir((b.transform.position - transform.position).magnitude);
         }
     }
 
@@ -41,16 +51,34 @@ public class HoleCam : MonoBehaviour
     {
         if (balls.Count != 0)
             nearest = balls[0];
-        foreach(Ball b in balls)
+        else
+        {
+            nearest = null;
+            if (live)
+                OnAir(99);
+            return;
+        }
+
+        foreach (Ball b in balls)
         {
             if (b.velocityMagnitude != 0 && (b.transform.position - transform.position).magnitude < (nearest.transform.position - transform.position).magnitude)
                 nearest = b;
         }
 
-        if (nearest.velocityMagnitude == 0 && live)
+        if (!live && nearest.velocityMagnitude != 0)
             OnAir((nearest.transform.position - transform.position).magnitude);
 
+        if (live && nearest.velocityMagnitude == 0)
+            OnAir((nearest.transform.position - transform.position).magnitude);
     }
+
+    private void RemoveBall(Ball b)
+    {
+        if (live && nearest == b)
+            OnAir(10);
+        balls.Remove(b);
+    }
+
 
     private void OnTriggerExit(Collider other)
     {
@@ -60,4 +88,6 @@ public class HoleCam : MonoBehaviour
                 balls.Remove(b);
         }
     }
+
+
 }

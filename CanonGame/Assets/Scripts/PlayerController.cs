@@ -5,7 +5,7 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     public static event System.Action<Vector3> Shooted;
-    public enum State { Aiming, Shooting, Waiting }
+    public enum State { Menu, Aiming, Shooting, Waiting }
 
     [Header("Setup")]
     [SerializeField]
@@ -33,7 +33,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private float slowMoAmonth = 2;
 
-    private State _currentState = State.Aiming;
+    private State _currentState = State.Menu;
     private Rigidbody _rigidbody;
     private bool _firing = false;
     private float _power = 0;
@@ -43,6 +43,8 @@ public class PlayerController : MonoBehaviour
     {
         WhiteBall.Impact += Impact;
         Holes.BallFell += RemoveBall;
+        Hud.Play += Play;
+        Hud.Pause += Pause;
 
         _rigidbody = wBall.GetComponent<Rigidbody>();
     }
@@ -51,7 +53,18 @@ public class PlayerController : MonoBehaviour
     {
         WhiteBall.Impact -= Impact;
         Holes.BallFell -= RemoveBall;
-        
+        Hud.Play -= Play;
+        Hud.Pause -= Pause;
+    }
+
+    private void Play()
+    {
+        StartCoroutine(SwitchState(State.Aiming));
+    }
+
+    private void Pause()
+    {
+        StartCoroutine(SwitchState(State.Menu));
     }
 
     public void RemoveBall(Ball obj)
@@ -92,12 +105,12 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Space))
         {         
             _firing = true;
-            hud.SwitchPowerBar();
+            hud.SwitchPowerBar(true);
         }
         if (Input.GetKeyUp(KeyCode.Space))
         {
             _firing = false;
-            hud.SwitchPowerBar();
+            hud.SwitchPowerBar(false);
             if (_power != 0)
             {
                 _rigidbody.AddForce(cameraShot.transform.forward.normalized * shotMaxPower * _power, ForceMode.Impulse);
@@ -177,6 +190,11 @@ public class PlayerController : MonoBehaviour
             case State.Waiting:
                 {
                     Time.timeScale = 1;
+                    break;
+                }
+            case State.Menu:
+                {
+                    camController.SwitchState(newState);
                     break;
                 }
         }

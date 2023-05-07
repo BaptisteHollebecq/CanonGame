@@ -6,11 +6,15 @@ using Cinemachine;
 public class CameraController : MonoBehaviour
 {
     [SerializeField]
+    private GameObject cameraMenu;
+    [SerializeField]
     private GameObject cameraShot;
     [SerializeField]
     private GameObject cameraFollow;
     [SerializeField]
     private GameObject cameraImpact;
+    [SerializeField]
+    private GameObject cameraZenit;
     [SerializeField]
     private CinemachineBrain brain;
     [SerializeField]
@@ -19,7 +23,7 @@ public class CameraController : MonoBehaviour
 
     private void Awake()
     {
-        cameraShot.SetActive(true);
+        cameraShot.SetActive(false);
         cameraFollow.SetActive(false);
         cameraImpact.SetActive(false);
     }
@@ -47,6 +51,7 @@ public class CameraController : MonoBehaviour
                     brain.m_DefaultBlend.m_Style = CinemachineBlendDefinition.Style.Linear;
                     brain.m_DefaultBlend.m_Time = 1f;
                     cameraImpact.gameObject.SetActive(false);
+                    cameraMenu.gameObject.SetActive(false);
                     cameraShot.SetActive(true);
                     cameraFollow.SetActive(false);
                     break;
@@ -56,6 +61,16 @@ public class CameraController : MonoBehaviour
                     brain.m_DefaultBlend.m_Time = .1f;
                     cameraShot.SetActive(false);
                     cameraFollow.SetActive(true);
+                    break;
+                }
+            case PlayerController.State.Menu:
+                {
+                    brain.m_DefaultBlend.m_Style = CinemachineBlendDefinition.Style.Linear;
+                    brain.m_DefaultBlend.m_Time = 1f;
+                    cameraImpact.gameObject.SetActive(false);
+                    cameraMenu.gameObject.SetActive(true);
+                    cameraShot.SetActive(false);
+                    cameraFollow.SetActive(false);
                     break;
                 }
         }
