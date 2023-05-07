@@ -9,13 +9,17 @@ public class PlayerController : MonoBehaviour
 
     [Header("Setup")]
     [SerializeField]
-    private Transform wBall;
+    private WhiteBall wBall;
     [SerializeField]
     private GameObject cameraShot;
     [SerializeField]
     private GameObject cameraFollow;
     [SerializeField]
     private CameraController camController;
+    [SerializeField]
+    private Hud hud;
+    [SerializeField]
+    private List<Ball> balls = new List<Ball>();
 
     [Header("Values")]
     [SerializeField]
@@ -25,14 +29,20 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private float shotMaxPower = 100;
     [SerializeField]
+    private float shotChargingMultiplier = 1;
+    [SerializeField]
     private float slowMoAmonth = 2;
 
     private State _currentState = State.Aiming;
     private Rigidbody _rigidbody;
+    private bool _firing = false;
+    private float _power = 0;
+    private int _switchPower = 1;
 
     private void Awake()
     {
         WhiteBall.Impact += Impact;
+        Holes.BallFell += RemoveBall;
 
         _rigidbody = wBall.GetComponent<Rigidbody>();
     }
@@ -40,7 +50,14 @@ public class PlayerController : MonoBehaviour
     private void OnDestroy()
     {
         WhiteBall.Impact -= Impact;
+        Holes.BallFell -= RemoveBall;
         
+    }
+
+    public void RemoveBall(Ball obj)
+    {
+        balls.Remove(obj);
+        Destroy(obj.gameObject);
     }
 
     private void Aim()
@@ -52,10 +69,16 @@ public class PlayerController : MonoBehaviour
         float shootingAngle = multiUp * Mathf.Floor(Vector3.Angle(shotForward, cameraShot.transform.forward));
 
         if (Input.GetKey(KeyCode.LeftArrow))
+        {
             cameraShot.transform.Rotate(new Vector3(0, -angleStep, 0), Space.World);
+            cameraFollow.transform.Rotate(new Vector3(0, -angleStep, 0), Space.World);
+        }
 
         if (Input.GetKey(KeyCode.RightArrow))
+        {
             cameraShot.transform.Rotate(new Vector3(0, angleStep, 0), Space.World);
+            cameraFollow.transform.Rotate(new Vector3(0, angleStep, 0), Space.World);
+        }
 
         if (Input.GetKey(KeyCode.UpArrow) && shootingAngle + angleStep <= aimMaxAngle)
             cameraShot.transform.Rotate(new Vector3(-angleStep, 0, 0));
@@ -67,18 +90,38 @@ public class PlayerController : MonoBehaviour
     private void Shot()
     {
         if (Input.GetKeyDown(KeyCode.Space))
+        {         
+            _firing = true;
+            hud.SwitchPowerBar();
+        }
+        if (Input.GetKeyUp(KeyCode.Space))
         {
-            _rigidbody.AddForce(cameraShot.transform.forward.normalized * shotMaxPower, ForceMode.Impulse);
-            Shooted?.Invoke(cameraShot.transform.forward.normalized);
-            SwitchState(State.Shooting);
+            _firing = false;
+            hud.SwitchPowerBar();
+            if (_power != 0)
+            {
+                _rigidbody.AddForce(cameraShot.transform.forward.normalized * shotMaxPower * _power, ForceMode.Impulse);
+                Shooted?.Invoke(cameraShot.transform.forward.normalized);
+                StartCoroutine(SwitchState(State.Shooting));
+            }
+            _power = 0;
+        }
+
+        if (_firing)
+        {
+            _power += Time.deltaTime * shotChargingMultiplier * _switchPower;
+            if (_power > 1 || _power < 0)
+                _switchPower *= -1;
+
+            hud.ActualisePowerBar(_power);
         }
     }
 
     private void Impact(Vector3 impactPoint)
     {
-        if (_currentState != State.Waiting)
+        if (_currentState == State.Shooting)
         {
-            SwitchState(State.Waiting);
+            StartCoroutine(SwitchState(State.Waiting));
             camController.GetRightImpactCamera(impactPoint);
         }
     }
@@ -93,17 +136,38 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        Debug.Log(Time.timeScale);
         if (_currentState == State.Aiming)
         {
             Shot();
         }
+        else if (_currentState == State.Waiting || _currentState == State.Shooting)
+        {
+            int moving = 0;
+            foreach(Ball b in balls)
+            {
+                if (b.velocityMagnitude != 0)
+                    moving++;
+            }
+            if(moving == 0)
+                StartCoroutine(SwitchState(State.Aiming));
+        }
+
+        if (balls.Count == 0)
+        {
+            // WIN
+        }
     }
 
-    private void SwitchState(State newState)
+    private IEnumerator SwitchState(State newState)
     {
-        switch(newState)
+        yield return new WaitForSeconds(0.05f);
+        switch (newState)
         {
+            case State.Aiming:
+                {
+                    camController.SwitchState(newState);
+                    break;
+                }
             case State.Shooting:
                 {
                     camController.SwitchState(newState);

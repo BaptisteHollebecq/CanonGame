@@ -4,15 +4,19 @@ using UnityEngine;
 
 public class Ball : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    public float velocityMagnitude;
+
+    protected Rigidbody _rigidbody;
+
+    protected void Awake()
     {
-        
+        _rigidbody = GetComponent<Rigidbody>();
     }
 
-    // Update is called once per frame
-    void Update()
+
+    private void FixedUpdate()
     {
-        
+        velocityMagnitude = _rigidbody.velocity.magnitude;
     }
+
 }

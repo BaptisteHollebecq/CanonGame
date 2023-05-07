@@ -13,6 +13,9 @@ public class CameraController : MonoBehaviour
     private GameObject cameraImpact;
     [SerializeField]
     private CinemachineBrain brain;
+    [SerializeField]
+    private Transform holesCam;
+
 
     private void Awake()
     {
@@ -39,8 +42,18 @@ public class CameraController : MonoBehaviour
     {
         switch (newState)
         {
+            case PlayerController.State.Aiming:
+                {
+                    brain.m_DefaultBlend.m_Style = CinemachineBlendDefinition.Style.Linear;
+                    brain.m_DefaultBlend.m_Time = 1f;
+                    cameraImpact.gameObject.SetActive(false);
+                    cameraShot.SetActive(true);
+                    cameraFollow.SetActive(false);
+                    break;
+                }
             case PlayerController.State.Shooting:
                 {
+                    brain.m_DefaultBlend.m_Time = .1f;
                     cameraShot.SetActive(false);
                     cameraFollow.SetActive(true);
                     break;
